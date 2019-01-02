@@ -1,0 +1,645 @@
+********************** Database Schematic Structure **********************
+
+
+Drop database if exists WholeSale_Services; 
+create database WholeSale_Services;
+use WholeSale_Services;
+
+
+
+Drop table if exists Manufacturer_superset;
+create table Manufacturer_superset(Manf_id varchar(20), Manf_name varchar(20), Addr varchar(20),City varchar(20), Cont varchar(20), primary key(Manf_id));
+
+Drop table if exists Vendor_superset;
+create table Vendor_superset(Vend_id varchar(20), Vend_name varchar(20), Addr varchar(20),City varchar(20), Cont varchar(20), primary key(Vend_id));
+
+Drop table if exists Inventory_superset;
+create table Inventory_superset(Inv_id varchar(20), Inv_name varchar(20), Description varchar(20), primary key(Inv_id));
+
+
+
+Drop table if exists Manufacture_side_inventory_import_management; 
+create table Manufacture_side_inventory_import_management(Inv_id varchar(20), Manf_id varchar(20), Per_inv_cost int(10), Inv_qty int(10), Tot_inv_cost int(10) as (Per_inv_cost * Inv_qty),foreign key(Inv_id) references Inventory_superset(Inv_id),foreign key(Manf_id) references Manufacturer_superset(Manf_id),primary key(Inv_id));
+
+
+
+
+Drop table if exists Manufacture_side_monetary_transaction; 
+create table Manufacture_side_monetary_transaction(Tn_no int(10) auto_increment, Manf_id varchar(20), PaidAmt int(20), Occasion Date, primary key(Tn_no), foreign key(Manf_id) references Manufacturer_superset(Manf_id));
+
+
+
+Drop table if exists Wholesale_station; 
+create table Wholesale_station(Inv_id varchar(20), Per_inv_cost int(10), Inv_qty int(10), Store_sec varchar(10), Tot_inv_cost int(10) as (Per_inv_cost * Inv_qty), foreign key(Inv_id) references Inventory_superset(Inv_id), primary key(Inv_id));
+
+
+
+
+Drop table if exists Vendor_side_inventory_export_management; 
+create table Vendor_side_inventory_export_management(Inv_id varchar(20), Vend_id varchar(20), Per_inv_cost int(10), Inv_qty int(10), Tot_inv_cost int(10) as (Per_inv_cost * Inv_qty), foreign key(Inv_id) references Inventory_superset(Inv_id),foreign key(Vend_id) references Vendor_superset(Vend_id),primary key(Inv_id));
+
+
+
+Drop table if exists Vendor_side_monetary_transaction; 
+create table Vendor_side_monetary_transaction(Tn_no int(10) auto_increment, Vend_id varchar(20), PaidAmt int(20), Occasion Date, primary key(Tn_no), foreign key(Vend_id) references Vendor_superset(Vend_id));
+
+
+************************************************************************
+************************************************************************
+
+
+delimiter //
+create procedure insert_into_Manufacturer_superset(in a varchar(20), in b varchar(20), in c varchar(20), in d varchar(20), in e varchar(20))
+begin
+
+insert into Manufacturer_superset(Manf_id, Manf_name, Addr, City, Cont) values(a,b,c,d,e);
+
+end;
+//
+delimiter ;
+
+
+call insert_into_Manufacturer_superset("aaa01", "ganesh pvt. Ltd.", "Sector-7", "pune", "123456709");
+call insert_into_Manufacturer_superset("aaa02", "gayatri  pvt. Ltd", "Sector-8", "nasik", "234567891");
+
+
+************************************************************************
+
+delimiter //
+create procedure insert_into_Vendor_superset(in a varchar(20), in b varchar(20), in c varchar(20), in d varchar(20), in e varchar(20))
+begin
+
+insert into Vendor_superset(Vend_id, Vend_name, Addr, City, Cont) values(a,b,c,d,e);
+
+end;
+//
+delimiter ;
+
+
+call insert_into_Vendor_superset("zzz01", "alisha gen store", "Sector-17", "pune", "765432747");
+call insert_into_Vendor_superset("zzz02", "sayali gen store", "Sector-16", "nasik", "654321565");
+
+
+************************************************************************
+
+delimiter //
+create procedure insert_into_Inventory_superset(in a varchar(20), in b varchar(20), in c varchar(20))
+begin
+
+insert into Inventory_superset(Inv_id, Inv_name, Description) values(a,b,c);
+
+end;
+//
+delimiter ;
+
+
+call insert_into_Inventory_superset("01pqr", "talc powder", "talc powder – ponds");
+call insert_into_Inventory_superset("02lmn", "oil", "oil- parachute");
+
+
+************************************************************************
+
+delimiter //
+create procedure insert_into_Manufacture_side_inventory_import_management(in a varchar(20), in b varchar(20), in c int(10), in d int(10))
+begin
+
+insert into Manufacture_side_inventory_import_management(Inv_id, Manf_id, Per_inv_cost, Inv_qty) values(a,b,c,d);
+
+end;
+//
+delimiter ;
+
+
+call insert_into_Manufacture_side_inventory_import_management("02lmn", "aaa02", 20, 5);
+call insert_into_Manufacture_side_inventory_import_management("01pqr", "aaa02", 20, 5);
+
+
+************************************************************************
+
+drop procedure if exists insert_into_Manufacture_side_monetary_transaction; 
+
+delimiter //
+create procedure insert_into_Manufacture_side_monetary_transaction(in a varchar(20), in b int(20))
+begin
+
+insert into Manufacture_side_monetary_transaction(Manf_id, PaidAmt, Occasion) values(a,b,sysdate());
+
+end;
+//
+delimiter ;
+
+
+call insert_into_Manufacture_side_monetary_transaction("aaa02", 500);
+
+************************************************************************
+
+delimiter //
+create procedure insert_into_Wholesale_station(in a varchar(20), in b int(10), in c int(10), in d varchar(10))
+begin
+
+insert into Wholesale_station(Inv_id, Per_inv_cost, Inv_qty, Store_sec) values(a,b,c,d);
+
+end;
+//
+delimiter ;
+
+
+call insert_into_Wholesale_station("01pqr", 25, 4, "B4");
+
+
+************************************************************************
+
+delimiter //
+create procedure insert_into_Vendor_side_inventory_export_management(in a varchar(20), in b varchar(20), in c int(10), in d int(10))
+begin
+
+insert into Vendor_side_inventory_export_management(Inv_id, Vend_id, Per_inv_cost, Inv_qty) values(a,b,c,d);
+
+end;
+//
+delimiter ;
+
+
+call insert_into_Vendor_side_inventory_export_management("02lmn", "zzz02", 20, 5);
+call insert_into_Vendor_side_inventory_export_management("01pqr", "zzz02", 20, 5);
+
+
+************************************************************************
+
+drop procedure if exists insert_into_Vendor_side_monetary_transaction;
+
+delimiter //
+create procedure insert_into_Vendor_side_monetary_transaction(in a varchar(20), in b int(20))
+begin
+
+insert into Vendor_side_monetary_transaction(Vend_id, PaidAmt, Occasion) values(a,b,sysdate());
+
+
+end;
+//
+delimiter ;
+
+
+call insert_into_Vendor_side_monetary_transaction("zzz01", 100);
+
+
+************************************************************************
+************************************************************************
+
+delimiter //
+create procedure manf_par_db(in a varchar(20))
+begin
+
+if a = "" then
+select * from Manufacturer_superset;
+else 
+select * from Manufacturer_superset where Manf_id = a;
+end if;
+
+end;
+//
+delimiter ;
+
+
+call manf_par_db("aaa01");  
+call manf_par_db("");
+
+************************************************************************
+
+delimiter //
+create procedure inv_par_db(in a varchar(20))
+begin
+
+if a = "" then
+select * from Inventory_superset;
+else 
+select * from Inventory_superset where Inv_id = a;
+end if;
+
+end;
+//
+delimiter ;
+
+
+call inv_par_db("01pqr");  
+call inv_par_db("");
+
+
+
+************************************************************************
+
+delimiter //
+create procedure vend_par_db(in a varchar(20))
+begin
+
+if a = "" then
+select * from Vendor_superset;
+else 
+select * from Vendor_superset where Vend_id = a;
+end if;
+
+end;
+//
+delimiter ;
+
+
+call vend_par_db("zzz01");  
+call vend_par_db("");
+
+************************************************************************
+
+
+delimiter //
+create procedure search_in_t1_using_inv_id(in a varchar(20))
+begin
+
+select Inventory_superset.*, Manufacture_side_inventory_import_management.Per_inv_cost, Manufacture_side_inventory_import_management.Inv_qty, Manufacture_side_inventory_import_management.Tot_inv_cost, Manufacturer_superset.* from Inventory_superset inner join Manufacture_side_inventory_import_management on Inventory_superset.Inv_id = a and Manufacture_side_inventory_import_management.Inv_id = a inner join Manufacturer_superset on Manufacture_side_inventory_import_management.Manf_id = (select Manf_id from Manufacture_side_inventory_import_management where Inv_id = a) and Manufacturer_superset.Manf_id = (select Manf_id from Manufacture_side_inventory_import_management where Inv_id = a);  
+
+
+end;
+//
+delimiter ;
+
+  
+call search_in_t1_using_inv_id("02lmn");
+
+
+************************************************************************
+
+drop procedure if exists search_in_t1_using_Manf_id;  
+
+delimiter //
+create procedure search_in_t1_using_Manf_id(in a varchar(20))
+begin
+
+select Manufacturer_superset.*, Manufacture_side_inventory_import_management.Inv_id, Manufacture_side_inventory_import_management.Per_inv_cost, Manufacture_side_inventory_import_management.Inv_qty, Manufacture_side_inventory_import_management.Tot_inv_cost from Manufacturer_superset inner join Manufacture_side_inventory_import_management on Manufacturer_superset.Manf_id = a and Manufacture_side_inventory_import_management.Manf_id = a;
+
+
+
+end;
+//
+delimiter ;
+
+
+call search_in_t1_using_Manf_id("aaa02");
+
+************************************************************************
+
+drop procedure if exists search_in_t2_using_manf_id;  
+
+delimiter //
+create procedure search_in_t2_using_manf_id(in a varchar(20))
+begin
+
+select Manufacture_side_monetary_transaction.*, Manufacturer_superset.Manf_name, Manufacturer_superset.Addr, Manufacturer_superset.City, Manufacturer_superset.Cont from Manufacturer_superset inner join Manufacture_side_monetary_transaction on Manufacturer_superset.Manf_id = a and Manufacture_side_monetary_transaction.Manf_id = a;  
+
+
+
+end;
+//
+delimiter ;
+
+
+call search_in_t2_using_manf_id("aaa02");
+
+************************************************************************
+
+drop procedure if exists search_in_t3_using_inv_id;  
+
+delimiter //
+create procedure search_in_t3_using_inv_id(in a varchar(20))
+begin
+
+select Wholesale_station.*, Inventory_superset.Inv_name,Inventory_superset.Description, Manufacturer_superset.* from Wholesale_station inner join Inventory_superset on Wholesale_station.Inv_id = a and Inventory_superset.Inv_id = a inner join Manufacturer_superset on Manufacturer_superset.Manf_id = (select Manf_id from Manufacture_side_inventory_import_management where Inv_id = a);  
+
+
+
+end;
+//
+delimiter ;
+
+
+call search_in_t3_using_inv_id("01pqr");
+
+************************************************************************
+
+delimiter //
+create procedure search_in_t4_using_inv_id(in a varchar(20))
+begin
+
+select Inventory_superset.*, Vendor_side_inventory_export_management.Per_inv_cost, Vendor_side_inventory_export_management.Inv_qty, Vendor_side_inventory_export_management.Tot_inv_cost, Vendor_superset.* from Inventory_superset inner join Vendor_side_inventory_export_management on Inventory_superset.Inv_id = a and Vendor_side_inventory_export_management.Inv_id = a inner join Vendor_superset on Vendor_side_inventory_export_management.Vend_id = (select Vend_id from Vendor_side_inventory_export_management where Inv_id = a) and Vendor_superset.Vend_id = (select Vend_id from Vendor_side_inventory_export_management where Inv_id = a);  
+
+
+end;
+//
+delimiter ;
+
+  
+call search_in_t4_using_inv_id("02lmn");
+
+
+************************************************************************
+
+drop procedure if exists search_in_t4_using_Vend_id;  
+
+delimiter //
+create procedure search_in_t4_using_Vend_id(in a varchar(20))
+begin
+
+select Vendor_superset.*, Vendor_side_inventory_export_management.Inv_id, Vendor_side_inventory_export_management.Per_inv_cost, Vendor_side_inventory_export_management.Inv_qty, Vendor_side_inventory_export_management.Tot_inv_cost from Vendor_superset inner join Vendor_side_inventory_export_management on Vendor_superset.Vend_id = a and Vendor_side_inventory_export_management.Vend_id = a;
+
+
+
+end;
+//
+delimiter ;
+
+
+call search_in_t4_using_Vend_id("zzz02");
+
+************************************************************************
+
+drop procedure if exists search_in_t5_using_vend_id;  
+
+delimiter //
+create procedure search_in_t5_using_vend_id(in a varchar(20))
+begin
+
+select Vendor_side_monetary_transaction.*, Vendor_superset.Vend_name, Vendor_superset.Addr, Vendor_superset.City, Vendor_superset.Cont from Vendor_side_monetary_transaction inner join Vendor_superset on Vendor_superset.Vend_id = a and Vendor_side_monetary_transaction.Vend_id = a;  
+
+
+
+end;
+//
+delimiter ;
+
+
+call search_in_t5_using_vend_id("zzz01");
+
+************************************************************************
+************************************************************************
+#a = id
+#b = qty
+#c = cost
+
+drop procedure if exists update_t1;  
+
+delimiter //
+create procedure update_t1(in a varchar(20), in b varchar(10), in c varchar(10))
+begin
+
+if((b <> "") and (c = ""))then
+update Manufacture_side_inventory_import_management set Inv_qty = convert(b,SIGNED) where Inv_id = a;
+elseif((b = "") and (c <> ""))then
+update Manufacture_side_inventory_import_management set Per_inv_cost = convert(c,SIGNED) where Inv_id = a;
+elseif((b <> "") and (c <> ""))then
+update Manufacture_side_inventory_import_management set Inv_qty = convert(b,SIGNED), Per_inv_cost = convert(c,SIGNED) where Inv_id = a;
+else select "Nothing Updated";
+end if;
+
+end;
+//
+delimiter ;
+
+
+call update_t1("01pqr","10","30");
+call update_t1("01pqr","20","");
+call update_t1("01pqr","","40");
+
+
+************************************************************************
+#a = Tn no.
+#b = paid amt
+#c = date
+
+drop procedure if exists update_t2;  
+
+delimiter //
+create procedure update_t2(in a varchar(20), in b varchar(10), in c varchar(20))
+begin
+
+if((b <> "") and (c = ""))then
+update Manufacture_side_monetary_transaction set PaidAmt = convert(b,SIGNED) where Tn_no = a;
+elseif((b = "") and (c <> ""))then
+update Manufacture_side_monetary_transaction set Occasion = convert(c,DATE) where Tn_no = a;
+elseif((b <> "") and (c <> ""))then
+update Manufacture_side_monetary_transaction set PaidAmt = convert(b,SIGNED), Occasion = convert(c,DATE) where Tn_no = a;
+else select "Nothing Updated";
+end if;
+
+end;
+//
+delimiter ;
+
+
+call update_t2("1", "","2018-08-17"); 
+call update_t2("1", "300",""); 
+call update_t2("1", "200",'2018-9-11'); 
+
+************************************************************************
+#a = id
+#b = qty
+#c = cost 
+#d = store
+
+drop procedure if exists update_t3;  
+
+delimiter //
+create procedure update_t3(in a varchar(20), in b varchar(10), in c varchar(10), in d varchar(20))
+begin
+
+if((b <> "") and (c = "") and (d = ""))then
+update Wholesale_station set Inv_qty = convert(b,SIGNED) where Inv_id = a;
+elseif((b = "") and (c <> "") and (d = ""))then
+update Wholesale_station set Per_inv_cost = convert(c,SIGNED) where Inv_id = a;
+elseif((b = "") and (c = "") and (d <> ""))then
+update Wholesale_station set Store_sec = convert(d,CHAR) where Inv_id = a;
+
+elseif((b <> "") and (c <> "") and (d = ""))then
+update Wholesale_station set Inv_qty = convert(b,SIGNED), Per_inv_cost = convert(c,SIGNED) where Inv_id = a;
+elseif((b = "") and (c <> "") and (d <> ""))then
+update Wholesale_station set Per_inv_cost = convert(c,SIGNED), Store_sec = convert(d,CHAR) where Inv_id = a;
+elseif((b <> "") and (c = "") and (d <> ""))then
+update Wholesale_station set Inv_qty = convert(b,SIGNED), Store_sec = convert(d,CHAR) where Inv_id = a;
+
+elseif((b <> "") and (c <> "") and (d <> ""))then
+update Wholesale_station set Inv_qty = convert(b,SIGNED), Per_inv_cost = convert(c,SIGNED), Store_sec = convert(d,CHAR) where Inv_id = a;
+else select "Nothing Updated";
+end if;
+
+end;
+//
+delimiter ;
+
+
+call update_t3("01pqr","2","5","AZ5");
+call update_t3("01pqr","10","2","");
+call update_t3("01pqr","2","5","AZ5");
+call update_t3("01pqr","2","5","AZ5");
+
+************************************************************************
+#a = id
+#b = qty
+#c = cost
+
+drop procedure if exists update_t4;  
+
+delimiter //
+create procedure update_t4(in a varchar(20), in b varchar(10), in c varchar(10))
+begin
+
+if((b <> "") and (c = ""))then
+update Vendor_side_inventory_export_management set Inv_qty = convert(b,SIGNED) where Inv_id = a;
+elseif((b = "") and (c <> ""))then
+update Vendor_side_inventory_export_management set Per_inv_cost = convert(c,SIGNED) where Inv_id = a;
+elseif((b <> "") and (c <> ""))then
+update Vendor_side_inventory_export_management set Inv_qty = convert(b,SIGNED), Per_inv_cost = convert(c,SIGNED) where Inv_id = a;
+else select "Nothing Updated";
+end if;
+
+end;
+//
+delimiter ;
+
+call update_t4("01pqr","10","300");
+call update_t4("01pqr","","200");
+call update_t4("01pqr","5","");
+
+
+************************************************************************
+#a = Tnno
+#b = AMt
+#c = date
+
+drop procedure if exists update_t5;  
+
+delimiter //
+create procedure update_t5(in a varchar(20), in b varchar(10), in c varchar(20))
+begin
+
+if((b <> "") and (c = ""))then
+update Vendor_side_monetary_transaction set PaidAmt = convert(b,SIGNED) where Tn_no = a;
+elseif((b = "") and (c <> ""))then
+update Vendor_side_monetary_transaction set Occasion = convert(c,DATE) where Tn_no = a;
+elseif((b <> "") and (c <> ""))then
+update Vendor_side_monetary_transaction set PaidAmt = convert(b,SIGNED), Occasion = convert(c,DATE) where Tn_no = a;
+else select "Nothing Updated";
+end if;
+
+end;
+//
+delimiter ;
+
+call update_t5("1","500","2018-01-08");
+call update_t5("3","","2018-01-08");
+
+
+************************************************************************
+************************************************************************
+
+drop procedure if exists delete_t1;  
+
+delimiter //
+create procedure delete_t1(in a varchar(20))
+begin
+
+delete from Manufacture_side_inventory_import_management where Inv_id = a; 
+ 
+end;
+//
+delimiter ;
+
+
+call delete_t1("02lmn");
+
+************************************************************************
+
+drop procedure if exists delete_t2;  
+
+delimiter //
+create procedure delete_t2(in a int(10))
+begin
+
+delete from Manufacture_side_monetary_transaction where Tn_no = a; 
+ 
+end;
+//
+delimiter ;
+
+
+call delete_t2(2);
+
+************************************************************************
+
+drop procedure if exists delete_t3;  
+
+delimiter //
+create procedure delete_t3(in a varchar(20))
+begin
+
+delete from Wholesale_station where Inv_id = a; 
+ 
+end;
+//
+delimiter ;
+
+
+call delete_t3("01pqr");
+
+
+************************************************************************
+
+drop procedure if exists delete_t4;  
+
+delimiter //
+create procedure delete_t4(in a varchar(20))
+begin
+
+delete from Vendor_side_inventory_export_management where Inv_id = a; 
+ 
+end;
+//
+delimiter ;
+
+
+call delete_t4("02lmn");
+
+
+************************************************************************
+
+drop procedure if exists delete_t5;  
+
+delimiter //
+create procedure delete_t5(in a int(10))
+begin
+
+delete from Vendor_side_monetary_transaction where Tn_no = a; 
+ 
+end;
+//
+delimiter ;
+
+
+call delete_t5(1);
+
+
+************************************************************************
+************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
